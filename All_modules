@@ -1,7 +1,7 @@
 import numpy as np
 ###################  database  ###################
 """
-data format of infoDB:
+data format of infodic:
 {
     'XXXXXX(user_id)': [{
         'time': '2019-02-06 17:11',
@@ -19,8 +19,8 @@ data format of infoDB:
 # authenDB = {'username':username, }
 class DataBaseModule:
 
-    def __init__(self, infoDB, authenDB):
-        self.infoDB = infoDB
+    def __init__(self, infodic, authenDB):
+        self.infodic = infodic
         self.authDB = authenDB
         self.auth = False
 
@@ -35,6 +35,7 @@ class DataBaseModule:
         if self.authDB[username] == password:
             print("Authentication Succeed!")
             self.auth = True
+            return self.auth
         else:
             print("Try username and password again")
 
@@ -46,11 +47,11 @@ class DataBaseModule:
         :return void
         """
         if self.auth:
-            self.infoDB.popitem(ID)
+            self.infodic.popitem(ID)
         else:
             print ("Authentation Failed")
 
-    def insert(self,ID,info):
+    def insert(self, ID, info):
         """
         insert patient's data, it will be stored by user id
         :param ID: user id
@@ -65,9 +66,11 @@ class DataBaseModule:
         :return void
         """
         if self.auth:
-            self.infoDB[ID] = info
+            self.infodic[ID] = info
+            return self.infodic
         else:
             print("Authentation Failed")
+
 
 
     def search(self, ID):
@@ -84,7 +87,7 @@ class DataBaseModule:
         }
         """
         if self.auth:
-            return self.infoDB[ID]
+            return self.infodic[ID]
         else:
             print("Authentation Failed")
 
@@ -97,8 +100,8 @@ class input_api:
         self.age = age
         self.gender = gender
         self.heartrate = heartrate
-        self.Systolic_BP = Systolic_BP    #收缩压
-        self.Diastolic_BP = Diastolic_BP  #舒张压
+        self.Systolic_BP = Systolic_BP
+        self.Diastolic_BP = Diastolic_BP
         self.blood_oxygen = blood_oxygen
         self.temperature = temperature
         self.time = time
@@ -174,13 +177,13 @@ class Analyzer():
         return False
 
     def Hypotension(self, Systolic_BP, Diastolic_BP):
-        # Hypotension judgement 低血压
+        # Hypotension judgement
         if (Systolic_BP < 90 and Diastolic_BP < 60):
             return True
         return False
 
     def Hypertension(self, Systolic_BP, Diastolic_BP):
-        # Hypertension judgement 高血压
+        # Hypertension judgement
         if (Systolic_BP > 140 or Diastolic_BP > 90):
             return True
         return False
@@ -302,19 +305,26 @@ def display_AI_iuput_data(AI, ID, infodic):
 ###################  mian  ###################
 
 def main():
-    #input
-    my_data = input_api('a', 70, 'male', 80, 90, 100, 11, 12, 13)
-    authenDB = {'admin':"123456"}
-    Data = DataBaseModule(my_data.dic,authenDB)
-    Data.authen('admin',"123456")
-    # print(my_data.return_request(2))
-    # user_interface()
-    Diastolic = my_data.dic['Diastolic_BP']
-    Systolic = my_data.dic['Systolic_BP']
-    blood_oxygen = my_data.dic['blood_oxygen']
-    temperature = my_data.dic['temperature']
-    heartrate = my_data.dic['heartrate']
 
+    ## input
+    my_data = input_api('a', 70, 'male', 80, 90, 100, 65, 38, 13)
+    authenDB = {'admin':"123456"}
+    Data = DataBaseModule(my_data.dic, authenDB)
+    Data.auth = Data.authen('admin',"123456")
+    aa = my_data.infodic['a']
+    ## database
+    # Database = DataBaseModule(my_data.infodic, authenDB)
+    # Data.auth = Data.authen('admin',"123456")
+    # print(DataBaseModule.insert(Data,'a',{'a',70,'male', 70, 80, 90, 74, 36.5, 14}))
+
+    # print(my_data.return_request(2))
+    Diastolic = aa[0]['Diastolic_BP']
+    Systolic = aa[0]['Systolic_BP']
+    blood_oxygen = aa[0]['blood_oxygen']
+    temperature = aa[0]['temperature']
+    heartrate = aa[0]['heartrate']
+
+    ## analyzer
     analyzer = Analyzer(Systolic,Diastolic,heartrate, blood_oxygen,temperature)
     Singal_Loss = analyzer.Signal_Loss(heartrate,temperature)
     Shock_Alert = analyzer.Shock_Alert(heartrate,temperature)
@@ -322,9 +332,12 @@ def main():
     Fever= analyzer.Fever(temperature)
     Hypotension = analyzer.Hypotension(Systolic,Diastolic)
     Hypertension = analyzer.Hypertension(Systolic,Diastolic)
+
+    ## output
     print(receive_basic_iuput_data(Singal_Loss, Shock_Alert, Oxygen_Supply, Fever, Hypotension, Hypertension))
     print(my_data.infodic)
-    #AI module
+
+    ## AI module
     AI = AI_module
     # print(AI_module.Query_Data_From_Database(AI,'a',my_data.infodic))
     display_AI_iuput_data(AI, 'a', my_data.infodic)
