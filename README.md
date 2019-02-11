@@ -22,7 +22,11 @@ data format of infodic:
 And the result of the .py file is :
 ![pyresult](pyresult.png)
 
+The exe file is so big that it was uploaded here:
 
-The exe file is also created, the result is as followed.
+https://drive.google.com/open?id=1KJhvdwta27qI9e2O2TDQWPmAFo7cc47U
+
+
+The result is as followed.
 ![exeresult](exeresult.png)
 
