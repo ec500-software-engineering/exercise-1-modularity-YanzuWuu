@@ -18,6 +18,7 @@ data format of infodic:
         }
     ]
 }
+
 And the result of the .py file is :
 ![pyresult](pyresult.png)
 
