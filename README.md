@@ -19,8 +19,9 @@ data format of infodic:
     ]
 }
 And the result of the .py file is :
-![exeresult](exeresult.png)
+![pyresult](pyresult.png)
 
 
 The exe file is also created, the result is as followed.
-![pyresult](pyresult.png)
+![exeresult](exeresult.png)
+
