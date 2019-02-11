@@ -141,13 +141,6 @@ class input_api:
             return self.user_id, self.dic
 
 
-#my_data = input_api('a', 1, 'male', 1, 1, 10000, 1, 1, 1)
-#print(my_data.dic)
-#my_data.implement_filter()
-#print(my_data.dic)
-#print(my_data.return_request())
-
-
 ###################analyzer####################
 class Analyzer():
 
@@ -201,7 +194,7 @@ class Analyzer():
 # Input: ID(from main function perhaps), infoDB(from Database function)
 # output: Three predicted parameters, three Alert signals(Type:Boolean
 
-class AI_module(object):
+class AI_module():
     def __init__(self, dict):
         self._dict = dict
 
@@ -212,37 +205,32 @@ class AI_module(object):
         Heartrate = list()
         Systolic= list()
         Diastolic= list()
-        DataBaseModule.search(ID)
+        # DataBaseModule.search(ID)
         # Username = input("")
         #get dictionary from database
         for key in infodic:
             if key == ID:
-                heartrate = infodic[ID]['heartrate']
-                oxygen = infodic[ID]['blood_oxygen']
-                Diastolic_BP = infodic[ID]['Diastolic_BP']
-                Systolic_BP = infodic[ID]['Systolic_BP']
+                a = infodic[ID]
+                heartrate = a[0]['heartrate']
+                oxygen = a[0]['blood_oxygen']
+                Diastolic_BP = a[0]['Diastolic_BP']
+                Systolic_BP = a[0]['Systolic_BP']
                 Heartrate.append(heartrate)
                 Blood_oxygen.append(oxygen)
                 Systolic.append(Systolic_BP)
                 Diastolic.append(Diastolic_BP)
 
-        return Blood_oxygen, Heartrate, Systolic,Diastolic
+        oxygen2=np.array(Blood_oxygen)
+        Heartrate2 = np.array(Heartrate)
+        diastolic2 = np.array(Diastolic)
+        systolic2 = np.array(Systolic)
+        Heartrate_predict_result = np.mean(Heartrate2)
+        oxygen_predict_result=np.mean(oxygen2)
+        Diastolic_predict_result = np.mean(diastolic2)
+        Systolic_predict_result = np.mean(systolic2)
 
 
-    def AI_Module(self,Blood_oxygen, Blood_pressure, Systolic,Diastolic):
-
-        ## AI module do the prediction, The AI module uses previous data
-        oxygen=np.array(Blood_oxygen)
-        pressure = np.array(Blood_pressure)
-        diastolic = np.array(Diastolic)
-        systolic = np.array(Systolic)
-        pressure_predict_result = np.mean(pressure)
-        oxygen_predict_result=np.mean(oxygen)
-        Diastolic_predict_result = np.mean(diastolic)
-        Systolic_predict_result = np.mean(systolic)
-
-
-        return pressure_predict_result, oxygen_predict_result, Diastolic_predict_result, Systolic_predict_result
+        return Heartrate_predict_result, oxygen_predict_result, Diastolic_predict_result, Systolic_predict_result
 
 
     def Feedback(self,Blood_pressure_predict_result, Blood_oxygen_predict_result, Diastolic_predict_result, Systolic_predict_result):
@@ -294,18 +282,21 @@ def receive_basic_iuput_data(Singal_Loss, Shock_Alert, Oxygen_Supply, Fever, Hyp
  #   return sentData, BasicData
 
 
-# def display_AI_iuput_data():
-#  ## Recevie AI data from input module, then analyze it using some judge functions to generate boolean result
-#  ## Paramter is boolean
-#  ## If paramter is True, means it should be alerted, then add it to the array
-#
-#     AI_module.AI_Module(Blood_oxygen, Blood_pressure, Systolic, Diastolic)
-#     print('blood pressure prediction:')
-#     print(pressure_predict_result)
-#     print('blood oxygen prediction:')
-#     print(oxygen_predict_result)
-#     print('Pulse_predict_result:')
-#     print(Diastolic_predict_result)
+def display_AI_iuput_data(AI, ID, infodic):
+ ## Recevie AI data from input module, then analyze it using some judge functions to generate boolean result
+ ## Paramter is boolean
+ ## If paramter is True, means it should be alerted, then add it to the array
+
+    AI_module.Query_Data_From_Database(AI, ID, infodic)
+    a = AI_module.Query_Data_From_Database(AI, ID, infodic)
+    print('Pulse prediction:')
+    print(a[0])
+    print('Blood oxygen prediction:')
+    print(a[1])
+    print('Diastolic blood pressure prediction:')
+    print(a[2])
+    print('Systolic blood pressure prediction:')
+    print(a[3])
 
 #def send_AI_input_data(AIResult):
  ## Receive the result and show it on terminal or web page
@@ -313,63 +304,7 @@ def receive_basic_iuput_data(Singal_Loss, Shock_Alert, Oxygen_Supply, Fever, Hyp
  #   return sentData
 
 
-################## interface
 
-# def user_interface():
-#     my_data = input_api('a', 70, 'male', 80, 90, 100, 11, 12, 13)
-#     wire = 2
-#     authenDB = {'admin':"123456"}
-#     Data = DataBaseModule(my_data.dic,authenDB)
-#     Data.authen('admin',"123456")
-#     while(True):
-#         print("\n#############  Menu:  ############\n#     1.Show the database        #\n#     2.Show the output          #\n#     3.Delete a user            #\n#     4.Search keyword           #\n"
-#       "#     5.The most popular labels  #\n#     6.Delete the database      #\n#     7.Exit                     #\n##################################")
-#         x = 0
-#         while x is 0:
-#             try:
-#                 x = int(input("Select an number: "))
-#                 if 0 < x < 8:
-#                     continue
-#                 else:
-#                     print("The number is out of range. Try again")
-#                     x = 0
-#             except ValueError:
-#                 print("Please input number. Try again ")
-#
-#         if ( x == 1):
-#             print(my_data.return_request(wire))
-#
-#         elif ( x == 2):
-#             Diastolic = my_data.dic['Diastolic_BP']
-#             Systolic = my_data.dic['Systolic_BP']
-#             blood_oxygen = my_data.dic['blood_oxygen']
-#             temperature = my_data.dic['temperature']
-#             heartrate = my_data.dic['heartrate']
-#
-#             analyzer = Analyzer(Systolic,Diastolic,heartrate, blood_oxygen,temperature)
-#             Singal_Loss = analyzer.Signal_Loss(heartrate,temperature)
-#             Shock_Alert = analyzer.Shock_Alert(heartrate,temperature)
-#             Oxygen_Supply = analyzer.Oxygen_Supply(blood_oxygen)
-#             Fever= analyzer.Fever(temperature)
-#             Hypotension = analyzer.Hypotension(Systolic,Diastolic)
-#             Hypertension = analyzer.Hypertension(Systolic,Diastolic)
-#             print(receive_basic_iuput_data(Singal_Loss, Shock_Alert, Oxygen_Supply, Fever, Hypotension, Hypertension))
-#
-
-        # elif ( x == 3):
-        #     delete_user()
-        #
-        # elif ( x == 4):
-        #     search_keyword()
-        #
-        # elif ( x == 5):
-        #     popular()
-        #
-        # elif ( x == 6):
-        #     delete_database()
-
-        # elif ( x== 7):
-        #     return
 ###################  mian  ###################
 
 def main():
@@ -395,5 +330,9 @@ def main():
     Hypertension = analyzer.Hypertension(Systolic,Diastolic)
     print(receive_basic_iuput_data(Singal_Loss, Shock_Alert, Oxygen_Supply, Fever, Hypotension, Hypertension))
     print(my_data.infodic)
+    AI = AI_module
+    print(AI_module.Query_Data_From_Database(AI,'a',my_data.infodic))
+    display_AI_iuput_data(AI, 'a', my_data.infodic)
+
 if __name__=='__main__':
     main()
