@@ -1,4 +1,4 @@
-#https://github.com/leonshen95/EC500-Modular-design-2.4/blob/master/input_api.py
+#https://github.com/leonshen95/EC500-Modular-design-2.4/blob/master/AI%20module.py
 # Input: ID(from main function perhaps), infoDB(from Database function)
 # output: Three predicted parameters, three Alert signals(Type:Boolean
 
