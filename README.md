@@ -30,6 +30,9 @@ https://drive.google.com/open?id=1KJhvdwta27qI9e2O2TDQWPmAFo7cc47U
 The result is as followed.
 ![exeresult](exeresult.png)
 
+All modules is connected and uploaded in the "All_modules" file, you can download and try.
+In each module's file, gave the link of original forms of the modules as comments.
+
 Known issues:
 
 1.The input module doesn't give input parameters automatically, so we have to give the patient's medical values at the main function, which is not intelligent.
