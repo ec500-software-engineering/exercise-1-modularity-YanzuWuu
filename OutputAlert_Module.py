@@ -1,3 +1,4 @@
+#https://github.com/leonshen95/EC500-Modular-design-2.4/blob/master/OutputAlert%20module.py
 from AI_module import AI_module
 def receive_basic_iuput_data(Singal_Loss, Shock_Alert, Oxygen_Supply, Fever, Hypotension, Hypertension):
  ##Recevie data from input module, then analyze it using some judge functions to generate boolean result
