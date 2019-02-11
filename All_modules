@@ -1,0 +1,399 @@
+import numpy as np
+###################database###################
+"""
+data format of infoDB:
+{
+    'XXXXXX(user_id)': [{
+        'time': '2019-02-06 17:11',
+        'gender': 'male',
+        'heartrate': 100,
+        'blood_pressure': 125,
+        'blood_oxygen': 0.7
+        },
+        {
+            ...
+        }
+    ]
+}
+"""
+# authenDB = {'username':username, }
+class DataBaseModule:
+
+    def __init__(self, infoDB, authenDB):
+        self.infoDB = infoDB
+        self.authDB = authenDB
+        self.auth = False
+
+
+    def authen(self, username, password):
+        """
+        user log in, must call this function before using delete\insert\search
+        :param username: user id
+        :param password: user password
+        :return void
+        """
+        if self.authDB[username] == password:
+            print("Authentication Succeed!")
+            self.auth = True
+        else:
+            print("Try username and password again")
+
+
+    def delete(self, ID):
+        """
+        delete patient's data based on user id
+        :param ID: user id
+        :return void
+        """
+        if self.auth:
+            self.infoDB.popitem(ID)
+        else:
+            print ("Authentation Failed")
+
+    def insert(self,ID,info):
+        """
+        insert patient's data, it will be stored by user id
+        :param ID: user id
+        :param info: patient's data, type: dict, format example:
+        {
+        'time': '2019-02-06 17:11',
+        'gender': 'male',
+        'heartrate': 100,
+        'blood_pressure': 125,
+        'blood_oxygen': 0.7
+        }
+        :return void
+        """
+        if self.auth:
+            self.infoDB[ID] = info
+        else:
+            print("Authentation Failed")
+
+
+    def search(self, ID):
+        """
+        search all patient's historical data based on user id
+        :param ID: user id
+        :return type: dict, format example:
+        {
+        'time': '2019-02-06 17:11',
+        'gender': 'male',
+        'heartrate': 100,
+        'blood_pressure': 125,
+        'blood_oxygen': 0.7
+        }
+        """
+        if self.auth:
+            return self.infoDB[ID]
+        else:
+            print("Authentation Failed")
+
+###################input###################
+class input_api:
+
+    def __init__(self, user_id, age, gender, heartrate, Systolic_BP, Diastolic_BP, blood_oxygen, temperature, time):
+
+        self.user_id = user_id
+        self.age = age
+        self.gender = gender
+        self.heartrate = heartrate
+        self.Systolic_BP = Systolic_BP    #收缩压
+        self.Diastolic_BP = Diastolic_BP  #舒张压
+        self.blood_oxygen = blood_oxygen
+        self.temperature = temperature
+        self.time = time
+        self.dic = {"ID": user_id, "age": age,"gender": gender, "heartrate": heartrate,
+                    "Diastolic_BP": Diastolic_BP, "Systolic_BP":Systolic_BP, "blood_oxygen": blood_oxygen,
+                    "temperature": temperature, "time": time}
+        # self.infodic = {self.dic['ID']:[self.dic]}
+        self.infodic = {}
+        self.infodic[self.dic['ID']]= [self.dic]
+
+
+
+
+    def filter(data):
+        wrong_flag = -1
+        noise = 500
+        if data > noise:
+            data = wrong_flag
+        return data
+
+
+
+    def implement_filter(self):
+        for key in self.dic.keys():
+            if (key != "user_id" and key != "age" and key != "gender" and key != "time"):
+                tmp = filter(self.dic[key])
+                self.dic[key] = tmp
+
+
+
+    def return_request(self, wire):
+        alert = 1
+        data_db = 2
+        if (wire == alert):
+            user_data_dic = {"heartrate": self.heartrate,
+                    "Diastolic_BP": self.Diastolic_BP, "Systolic_BP": self.Systolic_BP, "blood_oxygen": self.blood_oxygen,
+                    "temperature": self.temperature, "time": self.time}
+            return user_data_dic
+        if (wire == data_db):
+            return self.user_id, self.dic
+
+
+#my_data = input_api('a', 1, 'male', 1, 1, 10000, 1, 1, 1)
+#print(my_data.dic)
+#my_data.implement_filter()
+#print(my_data.dic)
+#print(my_data.return_request())
+
+
+###################analyzer####################
+class Analyzer():
+
+    def __init__(self, Systolic_BP, Diastolic_BP, Heart_Rate, Heart_O2_Level, Body_temp):
+        self.Systolic_BP = Systolic_BP
+        self.Diastolic_BP = Diastolic_BP
+        self.Heart_Rate = Heart_Rate
+        self.Heart_O2_Level = Heart_O2_Level
+        self.Body_temp = Body_temp
+
+    def Signal_Loss(self, Heart_Rate, Body_temp):
+        # Signal loss judgement
+        if (Heart_Rate < 60 and Body_temp < 36):
+            return True
+        return False
+
+    def Shock_Alert(self, Heart_Rate, Body_temp):
+        # Shock emergency judgement
+        if (Heart_Rate < 60 and Body_temp >= 36):
+            return True
+        return False
+
+    def Oxygen_Supply(self, Heart_O2_Level):
+        # Oxygen supply judgement
+        if (Heart_O2_Level < 70):
+            return True
+        return False
+
+    def Fever(self, Body_temp):
+        # Fever judgement
+        if (Body_temp > 37.5):
+            return True
+        return False
+
+    def Hypotension(self, Systolic_BP, Diastolic_BP):
+        # Hypotension judgement 低血压
+        if (Systolic_BP < 90 and Diastolic_BP < 60):
+            return True
+        return False
+
+    def Hypertension(self, Systolic_BP, Diastolic_BP):
+        # Hypertension judgement 高血压
+        if (Systolic_BP > 140 or Diastolic_BP > 90):
+            return True
+        return False
+
+
+####################AI module#####################
+
+
+# Input: ID(from main function perhaps), infoDB(from Database function)
+# output: Three predicted parameters, three Alert signals(Type:Boolean
+
+class AI_module(object):
+    def __init__(self, dict):
+        self._dict = dict
+
+    def Query_Data_From_Database(self,ID,infodic):
+        ## connect database, query previous one day data from Database
+        # Database = database_dict()
+        Blood_oxygen=list()
+        Heartrate = list()
+        Systolic= list()
+        Diastolic= list()
+        DataBaseModule.search(ID)
+        # Username = input("")
+        #get dictionary from database
+        for key in infodic:
+            if key == ID:
+                heartrate = infodic[ID]['heartrate']
+                oxygen = infodic[ID]['blood_oxygen']
+                Diastolic_BP = infodic[ID]['Diastolic_BP']
+                Systolic_BP = infodic[ID]['Systolic_BP']
+                Heartrate.append(heartrate)
+                Blood_oxygen.append(oxygen)
+                Systolic.append(Systolic_BP)
+                Diastolic.append(Diastolic_BP)
+
+        return Blood_oxygen, Heartrate, Systolic,Diastolic
+
+
+    def AI_Module(self,Blood_oxygen, Blood_pressure, Systolic,Diastolic):
+
+        ## AI module do the prediction, The AI module uses previous data
+        oxygen=np.array(Blood_oxygen)
+        pressure = np.array(Blood_pressure)
+        diastolic = np.array(Diastolic)
+        systolic = np.array(Systolic)
+        pressure_predict_result = np.mean(pressure)
+        oxygen_predict_result=np.mean(oxygen)
+        Diastolic_predict_result = np.mean(diastolic)
+        Systolic_predict_result = np.mean(systolic)
+
+
+        return pressure_predict_result, oxygen_predict_result, Diastolic_predict_result, Systolic_predict_result
+
+
+    def Feedback(self,Blood_pressure_predict_result, Blood_oxygen_predict_result, Diastolic_predict_result, Systolic_predict_result):
+        lower_BP= 80
+        upper_BP= 120
+        lower_BO = 80
+        upper_BO = 120
+        BP_Alert= False
+        BO_Alert = False
+
+        Pulse_Alert =False
+        if(Blood_oxygen_predict_result<lower_BO or Blood_oxygen_predict_result>upper_BO):
+            BO_Alert =True
+        if(Blood_pressure_predict_result<lower_BP or Blood_pressure_predict_result>upper_BP):
+            BP_Alert =True
+        if(Systolic_predict_result< 90 or Diastolic_predict_result <60 or Systolic_predict_result > 140 or Diastolic_predict_result > 90):
+            Pulse_Alert =True
+        ## feedback the AI prediction result to the interface
+        ## It will turn on the Alert when the statues get worse.
+        return BO_Alert,BP_Alert,Pulse_Alert
+
+
+####################output######################
+def receive_basic_iuput_data(Singal_Loss, Shock_Alert, Oxygen_Supply, Fever, Hypotension, Hypertension):
+ ##Recevie data from input module, then analyze it using some judge functions to generate boolean result
+ ##Boolean Parameters
+ ##If paramter returns True, means it should be alerted, then add it to the array
+    BasicResult = {'Signal_Loss':False, 'Shock_Alert':False,'Oxygen_Supply':False,'Fever':False,'Hypotension':False,'Hypertension':False}
+    if(Singal_Loss == True):
+        BasicResult['Signal Loss']=True
+    if(Shock_Alert == True):
+        BasicResult['Shock_Alert']=True
+    if(Oxygen_Supply == True):
+        BasicResult['Oxygen_Supply']=True
+    if(Fever == True):
+        BasicResult['Fever']=True
+    if(Hypotension == True):
+        BasicResult['Hypotension']=True
+    if(Hypertension == True):
+        BasicResult['Hypertension']=True
+
+    return BasicResult
+
+
+
+#def send_basic_input_data(BasicResult, BasicData):
+ ## Receive the result and show it on terminal or web page
+ #   sentData = analyze(BasicResult)
+ #   return sentData, BasicData
+
+
+# def display_AI_iuput_data():
+#  ## Recevie AI data from input module, then analyze it using some judge functions to generate boolean result
+#  ## Paramter is boolean
+#  ## If paramter is True, means it should be alerted, then add it to the array
+#
+#     AI_module.AI_Module(Blood_oxygen, Blood_pressure, Systolic, Diastolic)
+#     print('blood pressure prediction:')
+#     print(pressure_predict_result)
+#     print('blood oxygen prediction:')
+#     print(oxygen_predict_result)
+#     print('Pulse_predict_result:')
+#     print(Diastolic_predict_result)
+
+#def send_AI_input_data(AIResult):
+ ## Receive the result and show it on terminal or web page
+ #   sentData = analyze(AIResult)
+ #   return sentData
+
+
+################## interface
+
+# def user_interface():
+#     my_data = input_api('a', 70, 'male', 80, 90, 100, 11, 12, 13)
+#     wire = 2
+#     authenDB = {'admin':"123456"}
+#     Data = DataBaseModule(my_data.dic,authenDB)
+#     Data.authen('admin',"123456")
+#     while(True):
+#         print("\n#############  Menu:  ############\n#     1.Show the database        #\n#     2.Show the output          #\n#     3.Delete a user            #\n#     4.Search keyword           #\n"
+#       "#     5.The most popular labels  #\n#     6.Delete the database      #\n#     7.Exit                     #\n##################################")
+#         x = 0
+#         while x is 0:
+#             try:
+#                 x = int(input("Select an number: "))
+#                 if 0 < x < 8:
+#                     continue
+#                 else:
+#                     print("The number is out of range. Try again")
+#                     x = 0
+#             except ValueError:
+#                 print("Please input number. Try again ")
+#
+#         if ( x == 1):
+#             print(my_data.return_request(wire))
+#
+#         elif ( x == 2):
+#             Diastolic = my_data.dic['Diastolic_BP']
+#             Systolic = my_data.dic['Systolic_BP']
+#             blood_oxygen = my_data.dic['blood_oxygen']
+#             temperature = my_data.dic['temperature']
+#             heartrate = my_data.dic['heartrate']
+#
+#             analyzer = Analyzer(Systolic,Diastolic,heartrate, blood_oxygen,temperature)
+#             Singal_Loss = analyzer.Signal_Loss(heartrate,temperature)
+#             Shock_Alert = analyzer.Shock_Alert(heartrate,temperature)
+#             Oxygen_Supply = analyzer.Oxygen_Supply(blood_oxygen)
+#             Fever= analyzer.Fever(temperature)
+#             Hypotension = analyzer.Hypotension(Systolic,Diastolic)
+#             Hypertension = analyzer.Hypertension(Systolic,Diastolic)
+#             print(receive_basic_iuput_data(Singal_Loss, Shock_Alert, Oxygen_Supply, Fever, Hypotension, Hypertension))
+#
+
+        # elif ( x == 3):
+        #     delete_user()
+        #
+        # elif ( x == 4):
+        #     search_keyword()
+        #
+        # elif ( x == 5):
+        #     popular()
+        #
+        # elif ( x == 6):
+        #     delete_database()
+
+        # elif ( x== 7):
+        #     return
+###################  mian  ###################
+
+def main():
+    my_data = input_api('a', 70, 'male', 80, 90, 100, 11, 12, 13)
+    wire = 2
+    authenDB = {'admin':"123456"}
+    Data = DataBaseModule(my_data.dic,authenDB)
+    Data.authen('admin',"123456")
+    print(my_data.return_request(wire))
+    # user_interface()
+    Diastolic = my_data.dic['Diastolic_BP']
+    Systolic = my_data.dic['Systolic_BP']
+    blood_oxygen = my_data.dic['blood_oxygen']
+    temperature = my_data.dic['temperature']
+    heartrate = my_data.dic['heartrate']
+
+    analyzer = Analyzer(Systolic,Diastolic,heartrate, blood_oxygen,temperature)
+    Singal_Loss = analyzer.Signal_Loss(heartrate,temperature)
+    Shock_Alert = analyzer.Shock_Alert(heartrate,temperature)
+    Oxygen_Supply = analyzer.Oxygen_Supply(blood_oxygen)
+    Fever= analyzer.Fever(temperature)
+    Hypotension = analyzer.Hypotension(Systolic,Diastolic)
+    Hypertension = analyzer.Hypertension(Systolic,Diastolic)
+    print(receive_basic_iuput_data(Singal_Loss, Shock_Alert, Oxygen_Supply, Fever, Hypotension, Hypertension))
+    print(my_data.infodic)
+if __name__=='__main__':
+    main()
