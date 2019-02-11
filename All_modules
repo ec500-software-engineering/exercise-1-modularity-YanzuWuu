@@ -1,5 +1,5 @@
 import numpy as np
-###################database###################
+###################  database  ###################
 """
 data format of infoDB:
 {
@@ -88,7 +88,7 @@ class DataBaseModule:
         else:
             print("Authentation Failed")
 
-###################input###################
+###################  input  ####################
 class input_api:
 
     def __init__(self, user_id, age, gender, heartrate, Systolic_BP, Diastolic_BP, blood_oxygen, temperature, time):
@@ -110,15 +110,12 @@ class input_api:
         self.infodic[self.dic['ID']]= [self.dic]
 
 
-
-
     def filter(data):
         wrong_flag = -1
         noise = 500
         if data > noise:
             data = wrong_flag
         return data
-
 
 
     def implement_filter(self):
@@ -141,7 +138,8 @@ class input_api:
             return self.user_id, self.dic
 
 
-###################analyzer####################
+###################  analyzer  ####################
+
 class Analyzer():
 
     def __init__(self, Systolic_BP, Diastolic_BP, Heart_Rate, Heart_O2_Level, Body_temp):
@@ -298,22 +296,18 @@ def display_AI_iuput_data(AI, ID, infodic):
     print('Systolic blood pressure prediction:')
     print(a[3])
 
-#def send_AI_input_data(AIResult):
- ## Receive the result and show it on terminal or web page
- #   sentData = analyze(AIResult)
- #   return sentData
 
 
 
 ###################  mian  ###################
 
 def main():
+    #input
     my_data = input_api('a', 70, 'male', 80, 90, 100, 11, 12, 13)
-    wire = 2
     authenDB = {'admin':"123456"}
     Data = DataBaseModule(my_data.dic,authenDB)
     Data.authen('admin',"123456")
-    print(my_data.return_request(wire))
+    # print(my_data.return_request(2))
     # user_interface()
     Diastolic = my_data.dic['Diastolic_BP']
     Systolic = my_data.dic['Systolic_BP']
@@ -330,8 +324,9 @@ def main():
     Hypertension = analyzer.Hypertension(Systolic,Diastolic)
     print(receive_basic_iuput_data(Singal_Loss, Shock_Alert, Oxygen_Supply, Fever, Hypotension, Hypertension))
     print(my_data.infodic)
+    #AI module
     AI = AI_module
-    print(AI_module.Query_Data_From_Database(AI,'a',my_data.infodic))
+    # print(AI_module.Query_Data_From_Database(AI,'a',my_data.infodic))
     display_AI_iuput_data(AI, 'a', my_data.infodic)
 
 if __name__=='__main__':
