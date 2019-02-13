@@ -1,4 +1,8 @@
 # exercise-1-modularity-YanzuWuu
+
+### System Diagram
+
+<img align = center src = "https://github.com/leonshen95/EC500/blob/master/EC500%20diagram%201.jpg?raw=true">
 exercise-1-modularity-YanzuWuu created by GitHub Classroom
 
 We used dictionary to simulate database.
