@@ -30,7 +30,7 @@ data format of infodic:
 }
 
 And the result of the .py file is :
-![pyresult](pyresult.png)
+![result](result.png)
 
 The exe file is so big that it was uploaded here:(previous version without threads)
 
