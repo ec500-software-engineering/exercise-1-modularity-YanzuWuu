@@ -32,12 +32,12 @@ data format of infodic:
 And the result of the Exercise_1.py file is :
 ![result](result.png)
 
-The exe file is so big that it was uploaded here:(previous version without threads)
+The exe file's result is :
 
-https://drive.google.com/open?id=1KJhvdwta27qI9e2O2TDQWPmAFo7cc47U
+![exe_result](exe_result.png)
 
+Previous version's (without threads) result is as followed.
 
-The result is as followed.
 ![exeresult](exeresult.png)
 
 All modules is connected and uploaded in the "All_modules" file, you can download and try.
