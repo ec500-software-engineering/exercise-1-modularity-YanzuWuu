@@ -2,6 +2,12 @@
 
 ### System Diagram
 
+Full code is submitted in the "Exercise_1.py" file, you don't have to download other module files.
+
+Or you can run the exe file which need downloaded from this link:
+
+https://drive.google.com/open?id=1-XXSxImfEFPcoKhRZ4ijhqlTqhhosmH6
+
 <img align = center src = "https://github.com/leonshen95/EC500/blob/master/EC500%20diagram%201.jpg?raw=true">
 exercise-1-modularity-YanzuWuu created by GitHub Classroom
 
@@ -26,7 +32,7 @@ data format of infodic:
 And the result of the .py file is :
 ![pyresult](pyresult.png)
 
-The exe file is so big that it was uploaded here:
+The exe file is so big that it was uploaded here:(previous version without threads)
 
 https://drive.google.com/open?id=1KJhvdwta27qI9e2O2TDQWPmAFo7cc47U
 
