@@ -264,17 +264,17 @@ def receive_basic_iuput_data(Singal_Loss, Shock_Alert, Oxygen_Supply, Fever, Hyp
  ##Boolean Parameters
  ##If paramter returns True, means it should be alerted, then add it to the array
     BasicResult = {'Signal_Loss':False, 'Shock_Alert':False,'Oxygen_Supply':False,'Fever':False,'Hypotension':False,'Hypertension':False}
-    if(Singal_Loss == True):
+    if(Singal_Loss is True):
         BasicResult['Signal Loss']=True
-    if(Shock_Alert == True):
+    if(Shock_Alert is True):
         BasicResult['Shock_Alert']=True
-    if(Oxygen_Supply == True):
+    if(Oxygen_Supply is True):
         BasicResult['Oxygen_Supply']=True
-    if(Fever == True):
+    if(Fever is True):
         BasicResult['Fever']=True
-    if(Hypotension == True):
+    if(Hypotension is True):
         BasicResult['Hypotension']=True
-    if(Hypertension == True):
+    if(Hypertension is True):
         BasicResult['Hypertension']=True
 
     return BasicResult
@@ -356,11 +356,9 @@ def main():
     t3 = threading.Thread(output_thread(my_data3,'c'))
     print("#######################")
 
-
     t1.start()
     t2.start()
     t3.start()
-
 
 
 if __name__=='__main__':
