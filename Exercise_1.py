@@ -347,15 +347,14 @@ def main():
     my_data2 = input_api('b', 80, 'male', 85, 92, 90, 70, 40, 14)
     my_data3 = input_api('c', 82, 'female', 83, 91, 95, 80, 45, 15)
     t1 = threading.Thread(output_thread(my_data,'a'))
+    print("This is thread 1")
+    print("#######################")
     t2 = threading.Thread(output_thread(my_data2,'b'))
+    print("This is thread 2")
+    print("#######################")
     t3 = threading.Thread(output_thread(my_data3,'c'))
-
-
-    t1.start()
-    t2.start()
-    t3.start()
-
-
+    print("This is thread 3")
+    print("#######################")
 
 if __name__=='__main__':
     main()
